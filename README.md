@@ -5,9 +5,9 @@ Automatisierte Verlinkung zu Piratenprotokolle
 
 
 Requirements:
- Python3.x
- Python tornado
- Python Jinja2
+-Python3.x
+-Python Tornado
+-Python Jinja2
 
 
 Pakete sind in Winpython enthalten.
