@@ -18,11 +18,12 @@ template_piratetable = templateEnv.get_template("site.html")
 WochentagIndex ={"Montag":0, "Dienstag":1, "Mittwoch":2, "Donnerstag":3, "Freitag":4, "Samstag":5, "Sonntag":6}
 StammtischModel = {"Wochentag":"","Ort":"", "Uhrzeit" :"","Typ":"","PPad-group": "","wkday":0}
 
-
 Stammtisch = []
 Stammtisch.append(dict(StammtischModel))
 Stammtisch.append(dict(StammtischModel))
+
 ###### Konfiguration #########
+
 #Anzahl der Protokolle pro Stammtisch
 MAX_LINKS = 5
 #Liste der Adressen
@@ -42,8 +43,8 @@ Stammtisch[1]["Uhrzeit"] = "19:30"
 Stammtisch[1]["Typ"] = "AK-Kommunal-Stammtisch"
 
 Stammtisch[1]["PPad-group"] = "ak-kommunalpolitik-wuppertal"
-########### Konfiguration ende ##########
 
+########### Konfiguration ende ##########
 
 Stammtisch[0]["wkday"] =WochentagIndex[Stammtisch[0]["Wochentag"]]
 Stammtisch[1]["wkday"] =WochentagIndex[Stammtisch[1]["Wochentag"]]
@@ -129,9 +130,6 @@ def createHtmlOutput(i):
                                                                 group=Stammtisch[i]["PPad-group"],
                                                                 Information= padInformation[i])
 
-
-
-
 #Erzeuge Liste der Stammtische für Hauptseite
 def createStammtische():
     piratetable_list = []
@@ -139,10 +137,6 @@ def createStammtische():
         piratetable_list.append([Stammtisch[i]["Typ"],"Jeden " +Stammtisch[i]["Wochentag"] +" ab " + Stammtisch[i]["Uhrzeit"],
         "Ort: " + Stammtisch[i]["Ort"]])
     return piratetable_list
-
-
-
-
 
 #Handler für Hauptseite
 class MainHandler(tornado.web.RequestHandler):
@@ -163,13 +157,11 @@ application = tornado.web.Application([
     (r"/piratemeeting/([0-9]+)", ProtocolHandler),
 ])
 
-
 PORT=80
 if __name__ == "__main__":
     # Setup and start the server
     def set_extra_headers(self, path):
         self.set_header("Cache-control", "no-cache")
-
     updateVariables()
     html_output_main = template_main.render(list=createStammtische())
     application.listen(PORT)
