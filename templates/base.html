@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>{{title}}</title>
+
+<style type="text/css">
+a:link{
+color:#FF8800;
+text-decoration: none
+}
+a:visited{
+color:#FF8800;
+text-decoration: none
+}
+a:hover{color:#FF8800;
+text-decoration: none
+}
+a:active{color:#FF8800;
+text-decoration: none
+}
+
+body
+{
+background-color:#EEEEEE;
+}
+#txt-file
+{
+    color:#999999;
+}
+#information
+ {
+    font-size:small;
+ }
+</style>
+</head>
+<body>
+<center>
+    <p><img src="https://blog.piratenpartei-nrw.de/wuppertal/files/2012/10/Logo-Piratenpartei-Wuppertal2.gif" /></p>
+
+
+    <div id="content">
+        {# In the next line the content from the site.html template will be added #}
+        {% block content %}
+        <h2>Piratenpartei Wuppertal - Protokollübersicht</h2>
+
+
+         {% for item in list %}
+  	<a href="/piratemeeting/{{loop.index0}}"> <h3>{{ item[0]}}</h3></a>
+        <p> {{ item[1]}}</p>
+        <p> {{ item[2]}}</p>
+        <br/>
+
+	 {% endfor %}
+
+
+        {% endblock %}
+    </div>
+
+   <p>Die Webseite der Piratenpartei in Wuppertal finden Sie unter <a href="http://piratenpartei-wuppertal.de">piratenpartei-wuppertal.de</a></p>
+<p>Diese Seite wird bereitgestellt von <a href="http://www.project3001.org">MajorTom</a></p>
+</center>
+</body>
+</html>

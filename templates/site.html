@@ -1,0 +1,31 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!{% extends "base.html" %}
+{% block content %}
+    <p class="important">
+      <div id="content">
+    <h2>{{title}}</h2>
+    <p>Wenn folgende Zeile ins Protokoll hinzugefügt wird (am bessten am Anfang), wird diese automatisch eingelesen: </p>
+    <p> "- Hier steht eine kurze Protokoll Information -"</p>
+         {% for item in link %}
+    </br>
+  	<a href="https://{{group}}.piratenpad.de/{{item}}"> {{date[loop.index0]}}</a> <a id="txt-file" href="https://{{group}}.piratenpad.de/ep/pad/export/{{item}}/latest?format=txt"> TXT-Datei</a>
+    <p id="information">{{Information[loop.index0]}}</p>
+     {% endfor %}
+
+
+	</div>
+    </p>
+{% endblock %}
+
