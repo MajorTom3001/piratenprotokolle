@@ -87,16 +87,22 @@ def updateVariable(i):
     #Iteration über alle Treffen eines Stammtisches (Wochenweise)
     for j in range(MAX_LINKS):
             #Berechenung der Links-Adressen zu verschiedenen Wochen
-            links[i].append(calculateDateLink(Stammtisch[i]["wkday"]-((MAX_LINKS*7-14)-j*7)))
+            links[i].append(calculateDateLink(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-j*7)))
             #Berechnung des Link-Textes zu den verschiedenen Wochen
-            if wkday == Stammtisch[i]["wkday"]:
+            today = date.today()
+            isotoday = today.timetuple()
+
+            if (( isotoday.tm_wday == Stammtisch[i]["wkday"]) and  (j == (MAX_LINKS-1))):
                 datetextlinks[i].append("Protokoll für Heute")
+                links[i].append(calculateDateLink(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-(j+1)*7)))
+                datetextlinks[i].append("Vorbereitung für nächsten Stammtisch am: "
+                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-(j+1)*7)))
             elif j == (MAX_LINKS-1):
                 datetextlinks[i].append("Vorbereitung für nächsten Stammtisch am: "
-                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-14)-j*7)))
+                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-j*7)))
             else:
                 datetextlinks[i].append("Protokoll von "+Stammtisch[i]["Wochentag"]+", den: "
-                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-14)-j*7)))
+                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-j*7)))
             #Öffnen der Piratenpad-TXT-Datei
             try:
                 file = urllib.request.urlopen('https://'+Stammtisch[i]["PPad-group"]+'.piratenpad.de/ep/pad/export/'+links[i][j]+'/latest?format=txt')
@@ -148,7 +154,6 @@ class ProtocolHandler(tornado.web.RequestHandler):
     def get(self,Protocol_id):
         updateVariable(int(Protocol_id))
         self.write(createHtmlOutput(int(Protocol_id)))
-        print(Protocol_id)
 
 
 # Assign handler to the server root  (127.0.0.1:PORT/)
@@ -157,7 +162,7 @@ application = tornado.web.Application([
     (r"/piratemeeting/([0-9]+)", ProtocolHandler),
 ])
 
-PORT=80
+PORT=8000
 if __name__ == "__main__":
     # Setup and start the server
     def set_extra_headers(self, path):
