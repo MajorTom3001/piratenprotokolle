@@ -10,7 +10,7 @@ import urllib.request
 
 from datetime import date,timedelta
 #load template file templates/site.html and base.html
-templateLoader = FileSystemLoader( searchpath="templates/" )
+templateLoader = FileSystemLoader( searchpath="templates2/" )
 templateEnv = Environment( loader=templateLoader )
 template_main = templateEnv.get_template("base.html")
 template_piratetable = templateEnv.get_template("site.html")
@@ -21,13 +21,13 @@ StammtischModel = {"Wochentag":"","Ort":"", "Uhrzeit" :"","Typ":"","PPad-group":
 Stammtisch = []
 Stammtisch.append(dict(StammtischModel))
 Stammtisch.append(dict(StammtischModel))
-
+Stammtisch.append(dict(StammtischModel))
 ###### Konfiguration #########
 
 #Anzahl der Protokolle pro Stammtisch
 MAX_LINKS = 5
 #Liste der Adressen
-Orte = ["Wahlkreisbüro, Wichlinghauser Straße 61, 42277 Wuppertal-Wichlinghausen","Ort noch nicht bestimmt"]
+Orte = ["Wahlkreisbüro, Wichlinghauser Straße 61, 42277 Wuppertal-Wichlinghausen","Café Ada, Wiesenstraße 6, 42105 Wuppertal"]
 
 Stammtisch[0]["Wochentag"] = "Montag"
 Stammtisch[0]["Ort"] = Orte[0]
@@ -40,29 +40,39 @@ Stammtisch[0]["PPad-group"] = "stammtisch"
 Stammtisch[1]["Wochentag"] = "Dienstag"
 Stammtisch[1]["Ort"] = Orte[0]
 Stammtisch[1]["Uhrzeit"] = "19:30"
-Stammtisch[1]["Typ"] = "AK-Kommunal-Stammtisch"
-
+Stammtisch[1]["Typ"] = "AK-Kommunal-Stammtisch I"
 Stammtisch[1]["PPad-group"] = "ak-kommunalpolitik-wuppertal"
+
+Stammtisch[2]["Wochentag"] = "Donnerstag"
+Stammtisch[2]["Ort"] = Orte[1]
+Stammtisch[2]["Uhrzeit"] = "19:30"
+Stammtisch[2]["Typ"] = "AK-Kommunal-Stammtisch II"
+Stammtisch[2]["PPad-group"] = "wtal-kommunal-2"
+
 
 ########### Konfiguration ende ##########
 
 Stammtisch[0]["wkday"] =WochentagIndex[Stammtisch[0]["Wochentag"]]
 Stammtisch[1]["wkday"] =WochentagIndex[Stammtisch[1]["Wochentag"]]
-
+Stammtisch[2]["wkday"] =WochentagIndex[Stammtisch[2]["Wochentag"]]
 #date today
 today = date.today()
 isotoday = today.timetuple()
 wkday = isotoday.tm_wday
-
+logIn = False
 meetings_len = len(Stammtisch)
 
 #Globale Array-Variablen
-datetextlinks=[[],[]]  #Link-Text-Array
-links=[[],[]] #Link-Adress-Array
+datetextlinks=[[],[],[]]  #Link-Text-Array
+links=[[],[],[]] #Link-Adress-Array
 
-padInformation=[[],[]] #Kurzbeschreibungen der Treffen
+padInformation=[[],[],[]] #Kurzbeschreibungen der Treffen
 html_output_protocol = []  #Html-Output der Stammtischseiten
 piratetable_list = []  #Liste der Stammtische mit Ort-Zeit-Angaben für die Hauptseite
+
+
+
+
 
 #Berechnung der Piraten-Protokollendung für die Link-Adresse (Datum-Basiert)
 def calculateDateLink(day):
@@ -87,22 +97,21 @@ def updateVariable(i):
     #Iteration über alle Treffen eines Stammtisches (Wochenweise)
     for j in range(MAX_LINKS):
             #Berechenung der Links-Adressen zu verschiedenen Wochen
-            links[i].append(calculateDateLink(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-j*7)))
+            links[i].append(calculateDateLink(Stammtisch[i]["wkday"]-((MAX_LINKS*7-14)-j*7)))
             #Berechnung des Link-Textes zu den verschiedenen Wochen
             today = date.today()
             isotoday = today.timetuple()
 
-            if (( isotoday.tm_wday == Stammtisch[i]["wkday"]) and  (j == (MAX_LINKS-1))):
+            if (( isotoday.tm_wday == Stammtisch[i]["wkday"]) and  (j == (MAX_LINKS-2))):
                 datetextlinks[i].append("Protokoll für Heute")
-                links[i].append(calculateDateLink(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-(j+1)*7)))
-                datetextlinks[i].append("Vorbereitung für nächsten Stammtisch am: "
-                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-(j+1)*7)))
+                links[i].append(calculateDateLink(Stammtisch[i]["wkday"]-((MAX_LINKS*7-14)-(j+1)*7)))
+               
             elif j == (MAX_LINKS-1):
                 datetextlinks[i].append("Vorbereitung für nächsten Stammtisch am: "
-                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-j*7)))
+                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-14)-j*7)))
             else:
                 datetextlinks[i].append("Protokoll von "+Stammtisch[i]["Wochentag"]+", den: "
-                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-7)-j*7)))
+                                        + calculateDateText(Stammtisch[i]["wkday"]-((MAX_LINKS*7-14)-j*7)))
             #Öffnen der Piratenpad-TXT-Datei
             try:
                 file = urllib.request.urlopen('https://'+Stammtisch[i]["PPad-group"]+'.piratenpad.de/ep/pad/export/'+links[i][j]+'/latest?format=txt')
@@ -124,7 +133,7 @@ def updateVariable(i):
                     padInformation[i].append("Keine Kurzinformationen vorhanden!")
 
 #Erzeuge HTML output mit dem Template-System
-def createHtmlOutput(i):
+def createHtmlOutput(i,logInVal):
     return template_piratetable.render( title="Piratenpartei Wuppertal - Protokollübersicht " +
                                                                     Stammtisch[i]["Typ"],time_place = "Jeden" +
                                                                     Stammtisch[i]["Wochentag"] +"  ab " +
@@ -134,7 +143,10 @@ def createHtmlOutput(i):
                                                                 link=links[i],
                                                                 date=datetextlinks[i],
                                                                 group=Stammtisch[i]["PPad-group"],
-                                                                Information= padInformation[i])
+                                                                Information= padInformation[i],
+                                                                logIn = logInVal,
+                                                                meetingId = i
+                                                                )
 
 #Erzeuge Liste der Stammtische für Hauptseite
 def createStammtische():
@@ -144,22 +156,44 @@ def createStammtische():
         "Ort: " + Stammtisch[i]["Ort"]])
     return piratetable_list
 
+
+
+
+
+
+#Handler für Stammtisch-Protokoll-Seiten
+class ProtocolHandler(tornado.web.RequestHandler):
+    def get(self,Protocol_id):
+        self.Protocol_id = Protocol_id
+        updateVariable(int(Protocol_id))
+        if self.get_cookie( "passwd") == "1":
+            self.write(createHtmlOutput(int(Protocol_id),True) )
+        else:
+            self.write(createHtmlOutput(int(Protocol_id),False))
+
+class LoginHandler(tornado.web.RequestHandler):
+    def post(self):
+        passwd = self.get_argument("passwd")
+        meetingId = self.get_argument("meetingId")
+        if passwd == "schlömer":
+            self.set_cookie(name = "passwd", value = "1", domain=None, expires=None, path='/', expires_days=1)
+            self.set_cookie(name = "meetingId", value =meetingId, domain=None, expires=None, path='/', expires_days=1)
+        self.redirect("/piratemeeting/"+ str(meetingId))
+
+
+
 #Handler für Hauptseite
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.write(html_output_main)
 
-#Handler für Stammtisch-Protokoll-Seiten
-class ProtocolHandler(tornado.web.RequestHandler):
-    def get(self,Protocol_id):
-        updateVariable(int(Protocol_id))
-        self.write(createHtmlOutput(int(Protocol_id)))
 
 
 # Assign handler to the server root  (127.0.0.1:PORT/)
 application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/piratemeeting/([0-9]+)", ProtocolHandler),
+    (r"/login", LoginHandler),
 ])
 
 PORT=8000
